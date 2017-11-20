@@ -1,5 +1,3 @@
-import csv
-
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
@@ -9,9 +7,9 @@ import csv
 class App:
     def __init__(self, master):
         self.filename = ""
-        self.csvFines = ""
-        self.csvOverdues = ""
-        self.outputCsv = ""
+        self.fines_csv = ""
+        self.overdue_books_csv = ""
+        self.output_csv = ""
 
         master.minsize(width=360, height=240)
         master.title("Allan's time saving csv merge thingy")
@@ -19,7 +17,7 @@ class App:
         frame.pack()
 
         self.mergeButton = Button(
-            frame, text="Merge fines and overdues", command=self.merge_overdues_and_fines
+            frame, text="Merge fines and overdues", command=self.merge_overdue_books_and_fines
         )
         self.mergeButton.pack(side=LEFT)
 
@@ -28,44 +26,44 @@ class App:
         )
         self.button.pack(side=LEFT)
 
-    def merge_overdues_and_fines(self):
+    def merge_overdue_books_and_fines(self):
         messagebox.showinfo("Welcome", "Please follow the following instructions VERY carefully otherwise the program "
                                        "will most like crap itself.")
         messagebox.showinfo("Step 1", "Firstly, after you hit OK, select the CSV file containing the OVERDUE books "
                                       "(the fines one comes next)")
-        self.csvOverdues = filedialog.askopenfilename(title="Pick a file to clean",
-                                                   filetypes=(("csv files", "*.csv"), ("All files", "*.*")))
-        messagebox.showinfo("Step 2", "Secondly, select the CSV file containing the FINES (not the overdues)")
-        self.csvFines = filedialog.askopenfilename(title="Pick a file to clean",
-                                                      filetypes=(("csv files", "*.csv"), ("All files", "*.*")))
+        self.overdue_books_csv = filedialog.askopenfilename(title="Pick the OVERDUE BOOKS CSV",
+                                                            filetypes=(("csv files", "*.csv"), ("All files", "*.*")))
+        messagebox.showinfo("Step 2", "Secondly, select the CSV file containing the FINES (not the overdue books)")
+        self.fines_csv = filedialog.askopenfilename(title="Pick the FINES CSV",
+                                                    filetypes=(("csv files", "*.csv"), ("All files", "*.*")))
         messagebox.showinfo("Step 3", "Now, where would you like to save the output file (give it a name too!)?")
-        self.outputCsv = filedialog.asksaveasfilename(filetypes=(("csv files", "*.csv"), ("All files", "*.*")))
-        listOfOverdues = []
-        listOfFines = []
-        naughtyKids = []
+        self.output_csv = filedialog.asksaveasfilename(filetypes=(("csv files", "*.csv"), ("All files", "*.*")))
+        overdue_books_list = []
+        list_of_fines = []
+        naughty_kids = []
 
-        # Read in the overdues file
-        with open(self.csvOverdues, newline='') as csvfile:
-            inputFile = csv.reader(csvfile, delimiter=',', quotechar='|')
-            for row in inputFile:
+        # Read in the overdue books file
+        with open(self.overdue_books_csv, newline='') as csv_file:
+            input_file = csv.reader(csv_file, delimiter=',', quotechar='|')
+            for row in input_file:
                 # Remove all the header rows
                 if not ' '.join(row).strip().startswith('Class') \
                         and not ' '.join(row).strip().startswith('Palmerston') \
                         and not ' '.join(row).strip().startswith('Date'):
-                    listOfOverdues.append(' '.join(row).strip())
+                    overdue_books_list.append(' '.join(row).strip())
 
         # Read in the fines file
-        with open(self.csvFines, newline='') as csvfile:
-            inputFile = csv.reader(csvfile, delimiter=',', quotechar='|')
-            for row in inputFile:
+        with open(self.fines_csv, newline='') as csv_file:
+            input_file = csv.reader(csv_file, delimiter=',', quotechar='|')
+            for row in input_file:
                 # Remove all the header rows
                 if not ' '.join(row).strip().startswith('Name') \
                         and not ' '.join(row).strip().startswith('Palmerston') \
                         and not ' '.join(row).strip().startswith('Date') \
                         and not ' '.join(row).strip().startswith('Borrower'):
-                    listOfFines.append(' '.join(row).strip())
+                    list_of_fines.append(' '.join(row).strip())
 
-        def setCurrentFine():
+        def set_current_fine():
             # Clear current dict data
             return {
                 'formClass': "",
@@ -83,62 +81,62 @@ class App:
             }
 
         # Sort overdue books data into list of dictionaries
-        currentFine = setCurrentFine()
-        for i in range(len(listOfOverdues)):
+        current_fine = set_current_fine()
+        for i in range(len(overdue_books_list)):
 
-            row = listOfOverdues[i].replace('"', '').split()
+            row = overdue_books_list[i].replace('"', '').split()
 
             if i % 2 == 0:
-                currentFine["formClass"] = row[0]
-                currentFine["id"] = row[1]
-                currentFine["surname"] = row[2]
+                current_fine["formClass"] = row[0]
+                current_fine["id"] = row[1]
+                current_fine["surname"] = row[2]
                 try:
-                    currentFine["name"] = row[3]
+                    current_fine["name"] = row[3]
                 except IndexError:
                     # Allows for single name entities
                     pass
             else:
-                currentFine["classification"] = row[0]
-                currentFine["barcode"] = row[1]
-                currentFine["type"] = row[2]
-                currentFine["title"] = ' '.join(listOfOverdues[i].split('   ')[1].split()[1:])
-                currentFine["author"] = ' '.join(listOfOverdues[i].split('   ')[2].split('"')[0:2]).strip().strip('"') \
+                current_fine["classification"] = row[0]
+                current_fine["barcode"] = row[1]
+                current_fine["type"] = row[2]
+                current_fine["title"] = ' '.join(overdue_books_list[i].split('   ')[1].split()[1:])
+                current_fine["author"] = ' '.join(overdue_books_list[i].split('   ')[2].split('"')[0:2]).strip().strip('"') \
                     .replace('  ', ', ')
-                currentFine["dueDate"] = row[-3]
-                currentFine["letter"] = row[-2]
-                currentFine["fine"] = row[-1]
+                current_fine["dueDate"] = row[-3]
+                current_fine["letter"] = row[-2]
+                current_fine["fine"] = row[-1]
 
-                naughtyKids.append(currentFine.copy())
-                currentFine = setCurrentFine()
+                naughty_kids.append(current_fine.copy())
+                current_fine = set_current_fine()
 
         # Sort fine data into list of dictionaries
-        for i in range(len(listOfFines)):
-            row = listOfFines[i].replace('"', '').split()
+        for i in range(len(list_of_fines)):
+            row = list_of_fines[i].replace('"', '').split()
             if i % 2 == 0:
-                currentFine["surname"] = row[0]
-                currentFine["name"] = row[1]
-                currentFine["title"] = ' '.join(row[2:])
+                current_fine["surname"] = row[0]
+                current_fine["name"] = row[1]
+                current_fine["title"] = ' '.join(row[2:])
             else:
-                currentFine["id"] = row[0]
-                currentFine["formClass"] = row[1]
-                currentFine["fine"] = row[-1]
+                current_fine["id"] = row[0]
+                current_fine["formClass"] = row[1]
+                current_fine["fine"] = row[-1]
 
-                naughtyKids.append(currentFine.copy())
-                currentFine = setCurrentFine()
+                naughty_kids.append(current_fine.copy())
+                current_fine = set_current_fine()
 
         # Sort by surname
-        sortedList = sorted(naughtyKids, key=lambda k: k['surname'])
+        sortedList = sorted(naughty_kids, key=lambda k: k['surname'])
 
         # Write to new CSV file
-        with open(self.outputCsv+'.csv', 'w', newline='') as newcsvfile:
-            finalFile = csv.writer(newcsvfile, delimiter=',')
-            finalFile.writerow(
+        with open(self.output_csv+ '.csv', 'w', newline='') as new_csv_file:
+            final_file = csv.writer(new_csv_file, delimiter=',')
+            final_file.writerow(
                 ['Number', 'Name', 'Class', 'Title of very late book', 'Barcode', 'Type', 'Classification',
                  'Author', 'Date Due', 'Charge'])
             for row in sortedList:
                 # Excludes teachers
                 if row['formClass'] != 'TEACHER':
-                    finalFile.writerow([row['id'], ' '.join([row['surname'] + ',', row['name']]), row['formClass'],
+                    final_file.writerow([row['id'], ' '.join([row['surname'] + ',', row['name']]), row['formClass'],
                                         row['title'].strip('"').strip(), row['barcode'], row['type'],
                                         row['classification'],
                                         row['author'].strip(';'), row['dueDate'], row['fine']])
