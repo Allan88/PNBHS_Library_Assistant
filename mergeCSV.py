@@ -17,7 +17,7 @@ class App:
         frame.pack()
 
         self.mergeButton = Button(
-            frame, text="Merge fines and overdues", command=self.merge_overdue_books_and_fines
+            frame, text="Merge fines and overdue books CSVs", command=self.merge_overdue_books_and_fines
         )
         self.mergeButton.pack(side=LEFT)
 
@@ -100,8 +100,8 @@ class App:
                 current_fine["barcode"] = row[1]
                 current_fine["type"] = row[2]
                 current_fine["title"] = ' '.join(overdue_books_list[i].split('   ')[1].split()[1:])
-                current_fine["author"] = ' '.join(overdue_books_list[i].split('   ')[2].split('"')[0:2]).strip().strip('"') \
-                    .replace('  ', ', ')
+                current_fine["author"] = ' '.join(overdue_books_list[i].split('   ')[2].split('"')[0:2]).strip()\
+                    .strip('"').replace('  ', ', ')
                 current_fine["dueDate"] = row[-3]
                 current_fine["letter"] = row[-2]
                 current_fine["fine"] = row[-1]
@@ -125,21 +125,21 @@ class App:
                 current_fine = set_current_fine()
 
         # Sort by surname
-        sortedList = sorted(naughty_kids, key=lambda k: k['surname'])
+        sorted_list = sorted(naughty_kids, key=lambda k: k['surname'])
 
         # Write to new CSV file
-        with open(self.output_csv+ '.csv', 'w', newline='') as new_csv_file:
+        with open(self.output_csv + '.csv', 'w', newline='') as new_csv_file:
             final_file = csv.writer(new_csv_file, delimiter=',')
             final_file.writerow(
                 ['Number', 'Name', 'Class', 'Title of very late book', 'Barcode', 'Type', 'Classification',
                  'Author', 'Date Due', 'Charge'])
-            for row in sortedList:
+            for row in sorted_list:
                 # Excludes teachers
                 if row['formClass'] != 'TEACHER':
                     final_file.writerow([row['id'], ' '.join([row['surname'] + ',', row['name']]), row['formClass'],
-                                        row['title'].strip('"').strip(), row['barcode'], row['type'],
-                                        row['classification'],
-                                        row['author'].strip(';'), row['dueDate'], row['fine']])
+                                         row['title'].strip('"').strip(), row['barcode'], row['type'],
+                                         row['classification'],
+                                         row['author'].strip(';'), row['dueDate'], row['fine']])
         messagebox.showinfo("Done", "Files successfully merged!")
 
 
@@ -149,4 +149,3 @@ app = App(root)
 
 root.mainloop()
 root.destroy()
-
