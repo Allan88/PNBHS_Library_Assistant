@@ -1,7 +1,7 @@
+import csv
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
-import csv
 
 
 class App:
@@ -49,6 +49,7 @@ class App:
                 # Remove all the header rows
                 if not ' '.join(row).strip().startswith('Class') \
                         and not ' '.join(row).strip().startswith('Palmerston') \
+                        and not ' '.join(row).strip().startswith('Vertical') \
                         and not ' '.join(row).strip().startswith('Date'):
                     overdue_books_list.append(' '.join(row).strip())
 
@@ -66,18 +67,18 @@ class App:
         def set_current_fine():
             # Clear current dict data
             return {
-                'formClass': "",
-                'id': "",
-                'surname': "",
-                'name': "",
-                'classification': "",
-                'barcode': "",
-                'type': "",
-                'title': "",
-                'author': "",
-                'dueDate': "",
-                'letter': "",
-                'fine': "",
+                'formClass': "-",
+                'id': "-",
+                'surname': "-",
+                'name': "-",
+                'classification': "-",
+                'barcode': "-",
+                'type': "-",
+                'title': "-",
+                'author': "-",
+                'dueDate': "-",
+                'letter': "-",
+                'fine': "-",
             }
 
         # Sort overdue books data into list of dictionaries
@@ -85,26 +86,30 @@ class App:
         for i in range(len(overdue_books_list)):
 
             row = overdue_books_list[i].replace('"', '').split()
+            person = overdue_books_list[i].split('"')[1]
 
             if i % 2 == 0:
                 current_fine["formClass"] = row[0]
-                current_fine["id"] = row[1]
-                current_fine["surname"] = row[2]
+                current_fine["surname"] = person.split()[0]
                 try:
-                    current_fine["name"] = row[3]
+                    current_fine["name"] = person.split()[1]
                 except IndexError:
                     # Allows for single name entities
-                    pass
+                    current_fine["name"] = '-'
+                current_fine["title"] = overdue_books_list[i].split("    ")[1]
+                current_fine["barcode"] = row[-2]
             else:
-                current_fine["classification"] = row[0]
-                current_fine["barcode"] = row[1]
-                current_fine["type"] = row[2]
-                current_fine["title"] = ' '.join(overdue_books_list[i].split('   ')[1].split()[1:])
-                current_fine["author"] = ' '.join(overdue_books_list[i].split('   ')[2].split('"')[0:2]).strip()\
-                    .strip('"').replace('  ', ', ')
-                current_fine["dueDate"] = row[-3]
-                current_fine["letter"] = row[-2]
-                current_fine["fine"] = row[-1]
+                current_fine["id"] = row[0]
+                current_fine["classification"] = row[-2]
+
+                current_fine["type"] = row[-3]
+
+                try:
+                    current_fine["author"] = person.replace('  ', ', ')
+                except IndexError:
+                    current_fine["author"] = '-'
+
+                current_fine["dueDate"] = row[-1]
 
                 naughty_kids.append(current_fine.copy())
                 current_fine = set_current_fine()
