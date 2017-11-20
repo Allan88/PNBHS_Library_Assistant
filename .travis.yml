@@ -1,0 +1,7 @@
+language: python
+python:
+  - "3.6"
+script: python tests/test_barcode_cleaning.py
+branches:
+  only:
+    - master
