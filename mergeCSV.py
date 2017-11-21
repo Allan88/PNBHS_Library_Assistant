@@ -84,9 +84,13 @@ class App:
         # Sort overdue books data into list of dictionaries
         current_fine = set_current_fine()
         for i in range(len(overdue_books_list)):
-
             row = overdue_books_list[i].replace('"', '').split()
-            person = overdue_books_list[i].split('"')[1]
+            try:
+                person = overdue_books_list[i].split('"')[1]
+            except IndexError:
+                # If person doesn't have a comma in their name, it doesn't generate quotations
+                # so can't split by them
+                person = overdue_books_list[i].split('  ')[1]
 
             if i % 2 == 0:
                 current_fine["formClass"] = row[0]
