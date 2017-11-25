@@ -1,7 +1,12 @@
-import csv
 import operator
+from csv import reader
+from csv import writer
 from datetime import date
-from tkinter import *
+from tkinter import Button
+from tkinter import Frame
+from tkinter import Label
+from tkinter import Tk
+from tkinter import Toplevel
 from tkinter import filedialog
 from tkinter import messagebox
 
@@ -195,7 +200,7 @@ class App:
         """
 
         with open(overdue_books_csv) as csv_file:
-            read_csv = list(csv.reader(csv_file, delimiter=','))
+            read_csv = list(reader(csv_file, delimiter=','))
 
             # Get each pair of lines and shape their info into Student and
             # Offense classes
@@ -222,7 +227,7 @@ class App:
                 create_offense_from_overdue(author_info, student_info, student)
 
         with open(fines_csv) as csv_file:
-            read_csv = list(csv.reader(csv_file, delimiter=','))
+            read_csv = list(reader(csv_file, delimiter=','))
 
             # Get each pair of lines and shape their info into Student and
             # Offense classes
@@ -252,7 +257,7 @@ class App:
         output_file_name = filedialog.asksaveasfilename(
             filetypes=(("CSV file", "*.csv"), ("All files", "*.*")))
         with open(output_file_name + '.csv', 'w') as output_csv:
-            output_writer = csv.writer(output_csv, delimiter=',')
+            output_writer = writer(output_csv, delimiter=',')
             output_writer.writerow(
                 ['Number', 'Name', 'Class', 'Title of very late book',
                  'Barcode', 'Type', 'Classification', 'Author', 'Date Due',
